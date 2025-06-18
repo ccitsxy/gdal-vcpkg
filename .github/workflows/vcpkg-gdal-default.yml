@@ -1,0 +1,37 @@
+name: Build and Install GDAL with vcpkg
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest  # 或 ubuntu-latest, macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Clone vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.bat
+        
+    - name: Integrate and Install GDAL
+      run: |
+        cd vcpkg
+        ./vcpkg integrate install
+        ./vcpkg search gdal --featurepackages
+        ./vcpkg install gdal
+        
+    - name: Archive vcpkg artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: vcpkg-packages
+        path: |
+          vcpkg/installed/
+          vcpkg/packages/
+        retention-days: 7  # 产物保留7天
