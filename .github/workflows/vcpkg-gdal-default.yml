@@ -19,13 +19,8 @@ jobs:
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
         ./bootstrap-vcpkg.bat
-        
-    - name: Set up MINGW
-      run: |
-        echo "::add-path::C:\msys64\mingw64\bin"
-        pacman -S --noconfirm --needed mingw-w64-x86_64-toolchain
-        
-    - name: Integrate and Install GDAL with MINGW
+            
+    - name: Integrate and Install GDAL
       run: |
         cd vcpkg
         ./vcpkg integrate install
