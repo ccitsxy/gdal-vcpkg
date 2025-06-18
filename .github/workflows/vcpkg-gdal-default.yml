@@ -20,12 +20,17 @@ jobs:
         cd vcpkg
         ./bootstrap-vcpkg.bat
         
-    - name: Integrate and Install GDAL
+    - name: Set up MINGW
+      run: |
+        echo "::add-path::C:\msys64\mingw64\bin"
+        pacman -S --noconfirm --needed mingw-w64-x86_64-toolchain
+        
+    - name: Integrate and Install GDAL with MINGW
       run: |
         cd vcpkg
         ./vcpkg integrate install
         ./vcpkg search gdal --featurepackages
-        ./vcpkg install gdal
+        ./vcpkg install gdal --triplet x64-mingw-dynamic
         
     - name: Archive vcpkg artifacts
       uses: actions/upload-artifact@v4
