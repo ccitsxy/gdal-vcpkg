@@ -1,0 +1,54 @@
+name: Vcpkg GDAL CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            vcpkg_cmd: ./vcpkg
+            triplet: x64-linux
+          - os: windows-latest
+            vcpkg_cmd: .\vcpkg.bat
+            triplet: x64-windows
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Cache vcpkg
+      id: cache-vcpkg
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/vcpkg
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg-configuration.json') }}
+
+    - name: Install vcpkg
+      if: steps.cache-vcpkg.outputs.cache-hit != 'true'
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ${{ matrix.vcpkg_cmd }} bootstrap-vcpkg -disableMetrics
+        ${{ matrix.vcpkg_cmd }} integrate install
+      shell: bash
+
+    - name: Install GDAL with features
+      run: |
+        cd vcpkg
+        ${{ matrix.vcpkg_cmd }} install gdal[poppler,netcdf] --triplet ${{ matrix.triplet }} --recurse
+      shell: bash
+
+    - name: Verify GDAL installation
+      run: |
+        cd vcpkg
+        ${{ matrix.vcpkg_cmd }} list | grep gdal
+      shell: bash  
