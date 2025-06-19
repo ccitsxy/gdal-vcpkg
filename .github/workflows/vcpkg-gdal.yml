@@ -25,7 +25,7 @@ jobs:
         cd vcpkg
         ./vcpkg integrate install
         ./vcpkg search gdal --featurepackages
-        ./vcpkg install gdal[poppler,netcdf]
+        ./vcpkg install gdal:3.10.3
         
     - name: Archive vcpkg artifacts
       uses: actions/upload-artifact@v4
