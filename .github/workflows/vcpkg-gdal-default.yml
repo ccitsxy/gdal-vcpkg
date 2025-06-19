@@ -37,8 +37,7 @@ jobs:
       run: |
         cd vcpkg
         ./vcpkg integrate install
-        ./vcpkg search gdal --featurepackages
-        ./vcpkg install gdal --triplet x64-mingw-dynamic
+        ./vcpkg install
         
     - name: Archive vcpkg artifacts
       uses: actions/upload-artifact@v4
